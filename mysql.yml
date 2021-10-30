@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+
+  mysql:
+    image: mariadb:10.3
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-user01}'
+      MYSQL_DATABASE: '${DB_DATABASE:-mydb}'
+      MYSQL_USER: '${DB_USERNAME:-user01}'
+      MYSQL_PASSWORD: '${DB_PASSWORD:-user01}'
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/db:/docker-entrypoint-initdb.d
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_USER: '${DB_USERNAME:-user01}'
+      PMA_PASSWORD: '${DB_PASSWORD:-user01}'
+      PMA_HOST: 'mysql'
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    ports:
+      - "8889:80"

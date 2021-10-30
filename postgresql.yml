@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: '${DB_USERNAME:-user01}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-user01}'
+      POSTGRES_DB: '${DB_DATABASE:-mydb}'
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/db/:/docker-entrypoint-initdb.d/
+
+  phpgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: '${DB_EMAIL:-user01@docker.local}'
+      PGADMIN_DEFAULT_USER: '${DB_USERNAME:-user01}'
+      PGADMIN_DEFAULT_PASSWORD: '${DB_PASSWORD:-user01}'
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - "8889:80"
+    volumes:
+      - ./postgres/config/servers.json:/pgadmin4/servers.json
